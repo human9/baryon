@@ -1,6 +1,18 @@
 use core::system::System;
+use core::bus::Bus;
 use base::window::Windowing;
 use physics::simulation::Simulation;
+
+fn mainloop(systems: Vec<Box<System>>) {
+    println!("We've entered the mainloop");
+
+    let bus = Bus::new();
+    //loop {
+        for system in systems.iter() {
+            println!("{} status: {:?}", system.name(), system.run());
+        }
+    //}
+}
 
 pub fn startup() {
     
@@ -11,11 +23,4 @@ pub fn startup() {
     mainloop(systems);
 }
 
-fn mainloop(systems: Vec<Box<System>>) {
-    println!("We've entered the mainloop");
-    loop {
-        for system in systems.iter() {
-            println!("{} status: {:?}", system.name(), system.run());
-        }
-    }
-}
+
