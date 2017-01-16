@@ -4,12 +4,12 @@ use core::bus::Bus;
 use base::window::Windowing;
 use physics::simulation::Simulation;
 
-fn mainloop(systems: Vec<Box<System>>) {
+fn mainloop(mut systems: Vec<Box<System>>) {
     println!("We've entered the mainloop");
 
     let bus = Bus::new();
     //loop {
-        for system in systems.iter() {
+        for system in systems.iter_mut() {
             println!("{} status: {:?}", system.name(), system.run());
         }
     //}

@@ -1,7 +1,3 @@
-pub enum Type {
-    Test,
-}
-
+#[derive(Debug)]
 pub struct Message {
-    x: i32,
 }

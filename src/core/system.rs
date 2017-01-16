@@ -14,6 +14,6 @@ pub enum Status {
 pub trait System {
 
     fn init() -> Self where Self:Sized;
-    fn run(&self) -> Status;
+    fn run(&mut self) -> Status;
     fn name(&self) -> &'static str;
 }

@@ -19,7 +19,7 @@ impl Bus {
 
     pub fn deliver(&mut self, systems: Vec<Box<System>>) {
         while let Some(msg) = self.ring.pop_front() {
-            println!("hi");
+            println!("{:.?}", msg);
         }
     }
 }

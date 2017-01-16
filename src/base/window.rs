@@ -3,7 +3,6 @@ extern crate glutin;
 extern crate libc;
 
 use core::system;
-use core::message;
 
 use std::time::Duration;
 use std::thread;
@@ -24,7 +23,7 @@ impl system::System for Windowing {
 
         unsafe { 
             
-            window.make_current();
+            let _ = window.make_current();
 
             gl::load_with(|symbol| window.get_proc_address(symbol) as *const _);
 
@@ -35,16 +34,16 @@ impl system::System for Windowing {
         Windowing { name: "Windowing", status: system::Status::Okay, window: window}
     }
 
-    fn run(&self) -> system::Status {
+    fn run(&mut self) -> system::Status {
         for event in self.window.poll_events() {
             //unsafe { gl::Clear(gl::COLOR_BUFFER_BIT) };
 
             match event {
-                glutin::Event::Closed => break,
+                glutin::Event::Closed => self.status = system::Status::Finished,
                 _ => ()
             }
         }
-        self.window.swap_buffers();
+        let _ = self.window.swap_buffers();
 
         thread::sleep(Duration::from_millis(10));
 
