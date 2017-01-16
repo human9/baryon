@@ -1,0 +1,9 @@
+[package]
+name = "baryon"
+version = "0.1.0"
+authors = ["John Salamon <salamonj9@gmail.com>"]
+
+[dependencies]
+glutin = "*"
+gl = "*"
+libc = "*"
