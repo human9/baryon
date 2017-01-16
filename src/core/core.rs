@@ -1,4 +1,5 @@
 use core::system::System;
+use core::message::Message;
 use core::bus::Bus;
 use base::window::Windowing;
 use physics::simulation::Simulation;
@@ -15,7 +16,7 @@ fn mainloop(systems: Vec<Box<System>>) {
 }
 
 pub fn startup() {
-    
+
     let mut systems: Vec<Box<System>> = Vec::new();
     systems.push(Box::new(Windowing::init()));
     systems.push(Box::new(Simulation::init()));
