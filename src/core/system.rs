@@ -3,6 +3,7 @@ use core::message;
 #[derive(Copy)]
 #[derive(Clone)]
 #[derive(Debug)]
+#[derive(PartialEq)]
 pub enum Status {
     Empty,
     Full,
