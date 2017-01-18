@@ -1,10 +1,11 @@
 extern crate gl;
 extern crate glutin;
-extern crate libc;
+//extern crate libc;
 
 use core::system;
 use core::message::Message;
 use core::bus::Bus;
+use self::glutin::{Event, ElementState};
 
 pub struct Windowing {
     name: &'static str,
@@ -41,11 +42,29 @@ impl system::System for Windowing {
                 //unsafe { gl::Clear(gl::COLOR_BUFFER_BIT) };
 
                 match event {
-                    glutin::Event::Closed => {
+                    Event::Closed => {
                         self.status = system::Status::Finished;
                         bus.post(Message::Shutdown);
                     },
-                    _ => ()
+
+                    a @ Event::KeyboardInput(ElementState::Pressed, _, _) => {
+                        println!("{:?}", a);
+                    },
+
+                    a @ Event::MouseInput(ElementState::Pressed, _) => {
+                        println!("{:?}", a);
+                    },
+
+                    a @ Event::MouseMoved(_, _) => {
+                        println!("{:?}", a);
+                    },
+
+                    a @ Event::MouseWheel(_, _) => {
+                        println!("{:?}", a);
+                    },
+                    
+                    _ => (),
+
                 }
             }
             let _ = self.window.swap_buffers();

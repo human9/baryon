@@ -1,11 +1,9 @@
-use core::system::System;
-use core::system::Status;
+use core::system::{System, Status};
 use core::bus::Bus;
 use base::window::Windowing;
 use physics::simulation::Simulation;
 
-use std::time::Instant;
-use std::time::Duration;
+use std::time::{Instant, Duration};
 use std::thread;
 
 pub fn mainloop() {
@@ -26,6 +24,9 @@ pub fn mainloop() {
         complete = 0;
         instant = Instant::now();
 
+        /*
+         * Run each system in turn, passing a reference to the message bus.
+         */
         for system in systems.iter_mut() {
             
             match system.run(&mut bus) {
@@ -39,11 +40,17 @@ pub fn mainloop() {
             break;
         }
 
+        /*
+         * Deliver any posted messages to all systems.
+         */
         bus.deliver(&mut systems);
 
+
+        /*
+         * Prevent wasting cpu time.
+         */
         duration = instant.elapsed();
         diff = (duration.as_secs() * 1_000) + (duration.subsec_nanos() / 1_000_000) as u64;
-
         if diff < 10 {
             thread::sleep(Duration::from_millis(10));
         }
