@@ -13,6 +13,11 @@ pub struct Windowing {
     window: glutin::Window,
 }
 
+fn shutdown(status: &mut system::Status, bus: &mut Bus) {
+    *status = system::Status::Finished;
+    bus.post(Message::Shutdown);
+}
+
 impl system::System for Windowing {
     fn init() -> Self {
 
@@ -34,7 +39,7 @@ impl system::System for Windowing {
         Windowing { name: "Windowing", status: system::Status::Okay, window: window }
     }
 
-    fn run(&mut self, bus: &mut Bus) -> system::Status {
+    fn run(&mut self, bus: &mut Bus) -> &system::Status {
 
         if self.status == system::Status::Okay {
 
@@ -42,14 +47,8 @@ impl system::System for Windowing {
                 //unsafe { gl::Clear(gl::COLOR_BUFFER_BIT) };
 
                 match event {
-                    Event::Closed => {
-                        self.status = system::Status::Finished;
-                        bus.post(Message::Shutdown);
-                    },
-
-                    a @ Event::KeyboardInput(ElementState::Pressed, _, _) => {
-                        println!("{:?}", a);
-                    },
+                    Event::Closed => shutdown(&mut self.status, bus),
+                    Event::KeyboardInput(ElementState::Pressed, _, Escape) => shutdown(&mut self.status, bus),
 
                     a @ Event::MouseInput(ElementState::Pressed, _) => {
                         println!("{:?}", a);
@@ -71,7 +70,7 @@ impl system::System for Windowing {
 
         }
         
-        self.status
+        &self.status
     }
 
     fn handle(&mut self, msg: &Message) {

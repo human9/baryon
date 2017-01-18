@@ -12,8 +12,8 @@ impl system::System for Simulation {
         Simulation { name: "Simulation", status: system::Status::Okay }
     }
 
-    fn run(&mut self, bus: &mut Bus) -> system::Status {
-        self.status
+    fn run(&mut self, bus: &mut Bus) -> &system::Status {
+        &self.status
     }
     
     fn handle(&mut self, msg: &Message) {

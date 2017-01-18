@@ -2,6 +2,7 @@ use core::system::{System, Status};
 use core::bus::Bus;
 use base::window::Windowing;
 use physics::simulation::Simulation;
+use render::render::Rendering;
 
 use std::time::{Instant, Duration};
 use std::thread;
@@ -13,6 +14,7 @@ pub fn mainloop() {
     let mut systems: Vec<Box<System>> = Vec::new();
     systems.push(Box::new(Windowing::init()));
     systems.push(Box::new(Simulation::init()));
+    systems.push(Box::new(Rendering::init()));
 
     let mut complete: usize;
     let mut instant: Instant;
@@ -30,9 +32,9 @@ pub fn mainloop() {
         for system in systems.iter_mut() {
             
             match system.run(&mut bus) {
-                Status::Okay => (),
-                Status::Failed => println!("{} has failed", system.name()),
-                Status::Finished => complete += 1,
+                &Status::Okay => (),
+                &Status::Failed => println!("{} has failed", system.name()),
+                &Status::Finished => complete += 1,
             }
         }
 
