@@ -1,6 +1,6 @@
-pub use self::core::startup;
+pub use self::core::mainloop;
 
 mod core;
-mod bus;
+pub mod bus;
 pub mod system;
 pub mod message;

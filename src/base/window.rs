@@ -3,9 +3,8 @@ extern crate glutin;
 extern crate libc;
 
 use core::system;
-
-use std::time::Duration;
-use std::thread;
+use core::message::Message;
+use core::bus::Bus;
 
 pub struct Windowing {
     name: &'static str,
@@ -31,23 +30,35 @@ impl system::System for Windowing {
         
         };
 
-        Windowing { name: "Windowing", status: system::Status::Okay, window: window}
+        Windowing { name: "Windowing", status: system::Status::Okay, window: window }
     }
 
-    fn run(&mut self) -> system::Status {
-        for event in self.window.poll_events() {
-            //unsafe { gl::Clear(gl::COLOR_BUFFER_BIT) };
+    fn run(&mut self, bus: &mut Bus) -> system::Status {
 
-            match event {
-                glutin::Event::Closed => self.status = system::Status::Finished,
-                _ => ()
+        if self.status == system::Status::Okay {
+
+            for event in self.window.poll_events() {
+                //unsafe { gl::Clear(gl::COLOR_BUFFER_BIT) };
+
+                match event {
+                    glutin::Event::Closed => {
+                        self.status = system::Status::Finished;
+                        bus.post(Message::Shutdown);
+                    },
+                    _ => ()
+                }
             }
+            let _ = self.window.swap_buffers();
+
         }
-        let _ = self.window.swap_buffers();
-
-        thread::sleep(Duration::from_millis(10));
-
+        
         self.status
+    }
+
+    fn handle(&mut self, msg: &Message) {
+        match msg {
+            &Message::Shutdown => self.status = system::Status::Finished,
+        }
     }
 
     fn name(&self) -> &'static str {

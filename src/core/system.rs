@@ -1,12 +1,11 @@
 use core::message;
+use core::bus::Bus;
 
 #[derive(Copy)]
 #[derive(Clone)]
 #[derive(Debug)]
 #[derive(PartialEq)]
 pub enum Status {
-    Empty,
-    Full,
     Okay,
     Failed,
     Finished,
@@ -15,6 +14,7 @@ pub enum Status {
 pub trait System {
 
     fn init() -> Self where Self:Sized;
-    fn run(&mut self) -> Status;
+    fn run(&mut self, &mut Bus) -> Status;
+    fn handle(&mut self, &message::Message);
     fn name(&self) -> &'static str;
 }

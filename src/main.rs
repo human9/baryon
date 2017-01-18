@@ -3,5 +3,5 @@ mod base;
 mod physics;
 
 fn main() {
-    core::startup();
+    core::mainloop();
 }

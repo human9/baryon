@@ -14,12 +14,16 @@ impl Bus {
     }
 
     pub fn post(&mut self, msg: Message) {
+        println!("{:.?} posted", msg);
         self.ring.push_back(msg);
     }
 
-    pub fn deliver(&mut self, systems: Vec<Box<System>>) {
+    pub fn deliver(&mut self, systems: &mut Vec<Box<System>>) {
         while let Some(msg) = self.ring.pop_front() {
-            println!("{:.?}", msg);
+            for system in systems.iter_mut() {
+                system.handle(&msg);
+            }
+            println!("{:.?} delivered", msg);
         }
     }
 }

@@ -1,4 +1,6 @@
 use core::system;
+use core::message::Message;
+use core::bus::Bus;
 
 pub struct Simulation {
     name: &'static str,
@@ -10,8 +12,14 @@ impl system::System for Simulation {
         Simulation { name: "Simulation", status: system::Status::Okay }
     }
 
-    fn run(&mut self) -> system::Status {
+    fn run(&mut self, bus: &mut Bus) -> system::Status {
         self.status
+    }
+    
+    fn handle(&mut self, msg: &Message) {
+        match msg {
+            &Message::Shutdown => self.status = system::Status::Finished,
+        }
     }
 
     fn name(&self) -> &'static str {
