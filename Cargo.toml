@@ -7,3 +7,5 @@ authors = ["John Salamon <salamonj9@gmail.com>"]
 glutin = "*"
 gl = "*"
 libc = "*"
+tobj = "*"
+

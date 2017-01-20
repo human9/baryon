@@ -1,11 +1,10 @@
 extern crate gl;
 extern crate glutin;
-//extern crate libc;
 
 use core::system;
 use core::message::Message;
 use core::bus::Bus;
-use self::glutin::{Event, ElementState};
+use self::glutin::{Event, ElementState, VirtualKeyCode};
 
 pub struct Windowing {
     name: &'static str,
@@ -44,11 +43,16 @@ impl system::System for Windowing {
         if self.status == system::Status::Okay {
 
             for event in self.window.poll_events() {
-                //unsafe { gl::Clear(gl::COLOR_BUFFER_BIT) };
 
                 match event {
                     Event::Closed => shutdown(&mut self.status, bus),
-                    Event::KeyboardInput(ElementState::Pressed, _, Escape) => shutdown(&mut self.status, bus),
+                    Event::KeyboardInput(ElementState::Pressed, _, key) => 
+                    {
+                        match key.unwrap() {
+                            VirtualKeyCode::Escape => shutdown(&mut self.status, bus),
+                            _ => (),
+                        }
+                    },
 
                     a @ Event::MouseInput(ElementState::Pressed, _) => {
                         println!("{:?}", a);

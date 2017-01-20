@@ -3,6 +3,7 @@ use core::bus::Bus;
 use base::window::Windowing;
 use physics::simulation::Simulation;
 use render::render::Rendering;
+use game::logic::Logic;
 
 use std::time::{Instant, Duration};
 use std::thread;
@@ -11,10 +12,12 @@ pub fn mainloop() {
     println!("We've entered the mainloop");
 
     let mut bus = Bus::new();
-    let mut systems: Vec<Box<System>> = Vec::new();
-    systems.push(Box::new(Windowing::init()));
-    systems.push(Box::new(Simulation::init()));
-    systems.push(Box::new(Rendering::init()));
+    let mut systems = vec![
+        Box::new(Windowing::init()) as Box<System>,
+        Box::new(Simulation::init()),
+        Box::new(Rendering::init()),
+        Box::new(Logic::init()),
+    ];
 
     let mut complete: usize;
     let mut instant: Instant;

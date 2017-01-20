@@ -1,5 +1,6 @@
 mod core;
 mod base;
+mod game;
 mod physics;
 mod render;
 
