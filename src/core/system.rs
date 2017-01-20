@@ -1,4 +1,4 @@
-use core::message;
+use core::message::Message;
 use core::bus::Bus;
 
 #[derive(Debug)]
@@ -13,6 +13,6 @@ pub trait System {
 
     fn init() -> Self where Self:Sized;
     fn run(&mut self, &mut Bus) -> &Status;
-    fn handle(&mut self, &message::Message);
+    fn handle(&mut self, &Message);
     fn name(&self) -> &'static str;
 }

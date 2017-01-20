@@ -5,3 +5,4 @@ pub mod bus;
 pub mod system;
 pub mod message;
 pub mod object;
+pub mod scene;

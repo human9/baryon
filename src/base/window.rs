@@ -80,6 +80,7 @@ impl system::System for Windowing {
     fn handle(&mut self, msg: &Message) {
         match msg {
             &Message::Shutdown => self.status = system::Status::Finished,
+            _ => (),
         }
     }
 

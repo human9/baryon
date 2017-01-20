@@ -19,6 +19,7 @@ impl system::System for Simulation {
     fn handle(&mut self, msg: &Message) {
         match msg {
             &Message::Shutdown => self.status = system::Status::Finished,
+            _ => (),
         }
     }
 

@@ -1,9 +1,11 @@
 extern crate tobj;
 
 use core::system;
-use core::object;
+use core::object::Object;
+use core::scene::Scene;
 use core::message::Message;
 use core::bus::Bus;
+use std::collections::LinkedList;
 
 use std::path::Path;
 use std::collections::HashSet;
@@ -16,7 +18,7 @@ pub struct Logic {
 
 impl system::System for Logic {
     fn init() -> Self {
-        Logic { name: "Logic", status: system::Status::Okay, state: 0 }
+        Logic { name: "Logic", status: system::Status::Okay, state: 0, }
     }
 
     fn run(&mut self, bus: &mut Bus) -> &system::Status {
@@ -78,7 +80,12 @@ impl system::System for Logic {
                     }
                 }
 
-                let obj = object::Object { element_array: element_array, index_array: index_array };
+                let mut scene = Scene { objects: LinkedList::new() };
+                scene.objects.push_back(Object { element_array: element_array, index_array: index_array });
+                
+                bus.set_scene(scene);
+                bus.post(Message::LoadScene);
+
             },
 
             _ => {
@@ -91,6 +98,7 @@ impl system::System for Logic {
     fn handle(&mut self, msg: &Message) {
         match msg {
             &Message::Shutdown => self.status = system::Status::Finished,
+            _ => (),
         }
     }
 
