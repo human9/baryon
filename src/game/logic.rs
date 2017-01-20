@@ -1,6 +1,7 @@
 extern crate tobj;
 
 use core::system;
+use core::object;
 use core::message::Message;
 use core::bus::Bus;
 
@@ -54,28 +55,30 @@ impl system::System for Logic {
                         set.insert(index);
                         
                         elements.push(index); // push the unique element indeces
-                        index_array.push(i); // push the index of this element
+                        index_array.push(i as u32); // push the index of this element
                         i = i+1;
 
                         let v = index.0.unwrap();
-                        element_array.push(mesh.positions.get(*v as usize));
-                        element_array.push(mesh.positions.get(*v as usize + 1));
-                        element_array.push(mesh.positions.get(*v as usize + 2));
+                        element_array.push(*mesh.positions.get(*v as usize).unwrap());
+                        element_array.push(*mesh.positions.get(*v as usize + 1).unwrap());
+                        element_array.push(*mesh.positions.get(*v as usize + 2).unwrap());
 
                         let t = index.1.unwrap();
-                        element_array.push(mesh.texcoords.get(*t as usize));
-                        element_array.push(mesh.texcoords.get(*t as usize + 1));
+                        element_array.push(*mesh.texcoords.get(*t as usize).unwrap());
+                        element_array.push(*mesh.texcoords.get(*t as usize + 1).unwrap());
 
                         let n = index.2.unwrap();
-                        element_array.push(mesh.normals.get(*n as usize));
-                        element_array.push(mesh.normals.get(*n as usize + 1));
-                        element_array.push(mesh.normals.get(*n as usize + 2));
+                        element_array.push(*mesh.normals.get(*n as usize).unwrap());
+                        element_array.push(*mesh.normals.get(*n as usize + 1).unwrap());
+                        element_array.push(*mesh.normals.get(*n as usize + 2).unwrap());
                     }
                     else {
                         let pos = elements.iter().position(|&a| a == index).unwrap();
-                        index_array.push(pos); // push index of non-unique element
+                        index_array.push(pos as u32); // push index of non-unique element
                     }
                 }
+
+                let obj = object::Object { element_array: element_array, index_array: index_array };
             },
 
             _ => {
