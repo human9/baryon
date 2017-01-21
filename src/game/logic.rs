@@ -9,6 +9,7 @@ use std::collections::LinkedList;
 
 use std::path::Path;
 use std::collections::HashSet;
+use std::rc::Rc;
 
 pub struct Logic {
     name: &'static str,
@@ -80,11 +81,11 @@ impl system::System for Logic {
                     }
                 }
 
-                let mut scene = Scene { objects: LinkedList::new() };
+                let mut scene = Scene { objects: LinkedList::new(), name: "test scene" };
                 scene.objects.push_back(Object { element_array: element_array, index_array: index_array });
                 
-                bus.set_scene(scene);
-                bus.post(Message::LoadScene);
+                let rc_scene: Rc<Scene> = Rc::new(scene);
+                bus.post(Message::LoadScene(rc_scene));
 
             },
 
