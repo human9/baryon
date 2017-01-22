@@ -13,7 +13,7 @@ use std::io::prelude::*;
 use std::path::Path;
 
 pub struct Shader {
-    pub name: &'static str,
+    pub program: GLuint,
     pub attributes: Attributes,
     pub uniforms: Uniforms,
 }
@@ -31,12 +31,31 @@ pub struct Uniforms {
     pub sampler_uniform: GLint,
 }
 
-fn glsl_init(frag: &str, vert: &str) {
+unsafe fn glsl_init(frag: &str, vert: &str) -> Shader {
 
-    link_program(
+    let program = link_program(
         compile_shader(&file_to_string(vert), gl::VERTEX_SHADER),
         compile_shader(&file_to_string(frag), gl::FRAGMENT_SHADER)
     );
+
+    let attributes = Attributes {
+        vertex_attribute: gl::GetAttribLocation(program, CString::new("coord3d").unwrap().as_ptr()),
+        uv_attribute: gl::GetAttribLocation(program, CString::new("uv").unwrap().as_ptr()),
+        normals_attribute: gl::GetAttribLocation(program, CString::new("normals").unwrap().as_ptr()),
+    };
+
+    let uniforms = Uniforms {
+        model_uniform: gl::GetUniformLocation(program, CString::new("model").unwrap().as_ptr()),
+        view_uniform: gl::GetUniformLocation(program, CString::new("view").unwrap().as_ptr()),
+        mvp_uniform: gl::GetUniformLocation(program, CString::new("mvp").unwrap().as_ptr()),
+        sampler_uniform: gl::GetUniformLocation(program, CString::new("sampler").unwrap().as_ptr()),
+    };
+
+    Shader {
+        program: program,
+        attributes: attributes,
+        uniforms: uniforms,
+    }
 }
 
 fn file_to_string(string: &str) -> String
