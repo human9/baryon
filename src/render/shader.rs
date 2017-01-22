@@ -31,7 +31,7 @@ pub struct Uniforms {
     pub sampler_uniform: GLint,
 }
 
-unsafe fn glsl_init(frag: &str, vert: &str) -> Shader {
+pub unsafe fn glsl_init(frag: &str, vert: &str) -> Shader {
 
     let program = link_program(
         compile_shader(&file_to_string(vert), gl::VERTEX_SHADER),

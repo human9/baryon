@@ -13,4 +13,3 @@ impl fmt::Debug for Scene {
         write!(f, "<< !! SCENE !! >>")
     }
 }
-
