@@ -5,6 +5,7 @@ use core::object;
 use core::scene::Scene;
 use core::message::Message;
 use core::bus::Bus;
+use render::shader;
 use std::collections::LinkedList;
 
 use std::path::Path;
@@ -36,6 +37,8 @@ impl system::System for Logic {
                 scene.objects.push_back(teapot);
                 let rc_scene: Rc<Scene> = Rc::new(scene);
                 bus.post(Message::LoadScene(rc_scene));
+
+                unsafe { shader::glsl_init("resources/glsl/standard.vert", "resources/glsl/standard.frag"); };
             },
 
             _ => {
