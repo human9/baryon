@@ -1,10 +1,12 @@
 use std::collections::LinkedList;
 use core::object::Object;
 use std::fmt;
+use std::rc::Rc;
+use render::shader::Shader;
 
 pub struct Scene {
     pub name: &'static str,
-    pub objects: LinkedList<Object>,
+    pub objects: LinkedList<(Object, Rc<Shader>)>,
     // camera
 }
 

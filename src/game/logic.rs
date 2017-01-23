@@ -9,7 +9,6 @@ use render::shader;
 use std::collections::LinkedList;
 
 use std::path::Path;
-use std::collections::HashSet;
 use std::rc::Rc;
 
 pub struct Logic {
@@ -31,14 +30,17 @@ impl system::System for Logic {
 
                 let teapot_raw = tobj::load_obj(&Path::new("resources/mesh/sphere_hipoly.obj"));
                 assert!(teapot_raw.is_ok());
-                let (models, materials) = teapot_raw.unwrap();
+                let models  = teapot_raw.unwrap().0;
                 let teapot = object::tobj_to_object(&models.get(0).unwrap());
+
+                let shader;
+                unsafe { shader = shader::glsl_init("resources/glsl/standard.vert", "resources/glsl/standard.frag"); };
+                let rc_shader: Rc<shader::Shader> = Rc::new(shader);
+                
                 let mut scene = Scene { objects: LinkedList::new(), name: "test scene" };
-                scene.objects.push_back(teapot);
+                scene.objects.push_back( (teapot, rc_shader.clone()) );
                 let rc_scene: Rc<Scene> = Rc::new(scene);
                 bus.post(Message::LoadScene(rc_scene));
-
-                unsafe { shader::glsl_init("resources/glsl/standard.vert", "resources/glsl/standard.frag"); };
             },
 
             _ => {

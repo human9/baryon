@@ -2,7 +2,6 @@ extern crate gl;
 extern crate glutin;
 
 use self::gl::types::*;
-use std::mem;
 use std::ptr;
 use std::str;
 use std::ffi::CString;

@@ -37,6 +37,10 @@ impl system::System for Rendering {
         
         };
 
+        if let Some(ref scene) = self.scene {
+
+        }
+
         &self.status
     }
     
