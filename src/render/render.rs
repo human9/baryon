@@ -5,6 +5,9 @@ use core::message::Message;
 use core::bus::Bus;
 use core::scene::Scene;
 
+use self::gl::types::*;
+use std::mem;
+use std::ptr;
 use std::rc::Rc;
 use std::option::Option;
 
@@ -37,9 +40,56 @@ impl system::System for Rendering {
         
         };
 
-        if let Some(ref scene) = self.scene {
+        if let Some(ref scene) = self.scene { unsafe {
+            gl::Clear(gl::COLOR_BUFFER_BIT);
 
-        }
+            for object in scene.objects.iter() {
+                let ref o = object.0;
+                let ref s = object.1;
+
+                gl::UseProgram(s.program);
+                
+                gl::BindBuffer(gl::ARRAY_BUFFER, o.element_vbo);
+                
+                gl::EnableVertexAttribArray(s.attributes.vertex_attribute as GLuint);
+                gl::VertexAttribPointer(
+                    s.attributes.vertex_attribute as GLuint,
+                    3,
+                    gl::FLOAT,
+                    gl::FALSE,
+                    (mem::size_of::<GLfloat>() * 8) as GLsizei,
+                    ptr::null()
+                );
+
+                gl::EnableVertexAttribArray(s.attributes.uv_attribute as GLuint);
+                gl::VertexAttribPointer(
+                    s.attributes.uv_attribute as GLuint,
+                    2,
+                    gl::FLOAT,
+                    gl::FALSE,
+                    (mem::size_of::<GLfloat>() * 8) as GLsizei,
+                    (mem::size_of::<GLfloat>() * 3) as *const GLvoid,
+                );
+                
+                gl::EnableVertexAttribArray(s.attributes.normals_attribute as GLuint);
+                gl::VertexAttribPointer(
+                    s.attributes.normals_attribute as GLuint,
+                    3,
+                    gl::FLOAT,
+                    gl::FALSE,
+                    (mem::size_of::<GLfloat>() * 8) as GLsizei,
+                    (mem::size_of::<GLfloat>() * 5) as *const GLvoid,
+                );
+
+                gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, o.index_vbo);
+                gl::DrawElements(
+                    gl::TRIANGLES,
+                    o.index_array.len() as GLint,
+                    gl::UNSIGNED_INT,
+                    ptr::null()
+                );
+            }
+        }}
 
         &self.status
     }

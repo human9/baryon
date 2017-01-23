@@ -7,6 +7,7 @@ use core::message::Message;
 use core::bus::Bus;
 use render::shader;
 use std::collections::LinkedList;
+use game::camera::Camera;
 
 use std::path::Path;
 use std::rc::Rc;
@@ -37,7 +38,11 @@ impl system::System for Logic {
                 unsafe { shader = shader::glsl_init("resources/glsl/standard.vert", "resources/glsl/standard.frag"); };
                 let rc_shader: Rc<shader::Shader> = Rc::new(shader);
                 
-                let mut scene = Scene { objects: LinkedList::new(), name: "test scene" };
+                let mut scene = Scene { 
+                    name: "Test Scene",
+                    objects: LinkedList::new(),
+                    camera: Camera::new(),
+                };
                 scene.objects.push_back( (teapot, rc_shader.clone()) );
                 let rc_scene: Rc<Scene> = Rc::new(scene);
                 bus.post(Message::LoadScene(rc_scene));

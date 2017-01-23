@@ -1,11 +1,14 @@
 extern crate gl;
 extern crate tobj;
 
-use self::gl::types::{GLuint, GLfloat};
 use std::collections::HashSet;
+use std::mem;
+use self::gl::types::*;
 
 #[derive(Debug)]
 pub struct Object {
+    pub element_vbo: GLuint,
+    pub index_vbo: GLuint,
     pub element_array: Vec<GLfloat>,
     pub index_array: Vec<GLuint>,
 }
@@ -62,7 +65,35 @@ pub fn tobj_to_object(model: &tobj::Model) -> Object {
             index_array.push(pos as u32); // push index of non-unique element
         }
     }
+
+    let mut element_vbo = 0;
+    let mut index_vbo = 0;
+    unsafe {
+        gl::GenBuffers(1, &mut element_vbo);
+        gl::BindBuffer(gl::ARRAY_BUFFER, element_vbo);
+        gl::BufferData(
+            gl::ARRAY_BUFFER,
+            (element_array.len() * mem::size_of::<GLfloat>()) as GLsizeiptr,
+            mem::transmute(&element_array[0]),
+            gl::STATIC_DRAW
+        );
+
+        gl::GenBuffers(1, &mut index_vbo);
+        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, index_vbo);
+        gl::BufferData(
+            gl::ELEMENT_ARRAY_BUFFER,
+            (index_array.len() * mem::size_of::<GLuint>()) as GLsizeiptr,
+            mem::transmute(&index_array[0]),
+            gl::STATIC_DRAW
+        );
+    }
+
     
-    Object { element_array: element_array, index_array: index_array }
+    Object { 
+        element_vbo: element_vbo,
+        index_vbo: index_vbo,
+        element_array: element_array,
+        index_array: index_array
+    }
 
 }
