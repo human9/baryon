@@ -6,6 +6,7 @@ dependencies = [
  "glm 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "glutin 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.19 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
  "tobj 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 

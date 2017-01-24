@@ -31,7 +31,7 @@ impl system::System for Windowing {
 
             gl::load_with(|symbol| window.get_proc_address(symbol) as *const _);
 
-            gl::ClearColor(0.0, 0.0, 0.0, 0.0);
+            gl::ClearColor(0.2, 0.0, 0.2, 0.0);
         
         };
 

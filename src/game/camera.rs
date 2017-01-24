@@ -48,12 +48,12 @@ impl Camera {
     }
 
     // Return where the camera is
-    pub fn get_eye(&mut self) -> Vector3<f32> {
+    pub fn get_eye(&self) -> Vector3<f32> {
         self.position
     }
 
     // Retern where the camera is looking
-    pub fn get_center(&mut self) -> Vector3<f32> {
+    pub fn get_center(&self) -> Vector3<f32> {
         let az = self.azimuth * PI / 180.;
         let el = self.elevation * PI / 180.;
         Vector3::<f32>::new(

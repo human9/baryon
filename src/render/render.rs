@@ -1,4 +1,9 @@
 extern crate gl;
+extern crate glm;
+extern crate num;
+
+use self::glm::*;
+use self::glm::ext::*;
 
 use core::system;
 use core::message::Message;
@@ -36,18 +41,38 @@ impl system::System for Rendering {
 
         unsafe { 
             
-            gl::Clear(gl::COLOR_BUFFER_BIT);
         
+            gl::Enable(gl::BLEND);
+            gl::Enable(gl::DEPTH_TEST);
+            gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
+            
+            gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
         };
 
         if let Some(ref scene) = self.scene { unsafe {
-            gl::Clear(gl::COLOR_BUFFER_BIT);
+
+            let model: Mat4 = num::one();
+            //println!("{:.?}", model);
+            translate(&model, vec3(0.0, 0.0, -4.0));
+            
+            let eye = scene.camera.get_eye();
+            let center = scene.camera.get_center();
+            let up = vec3(0.0, 1.0, 0.0);
+            let view = look_at(eye, center, up);
+
+            let projection = perspective::<f32>(45.0, 800./600., 0.1, 1000.0);
+
+            let mvp = projection * view * model;
 
             for object in scene.objects.iter() {
                 let ref o = object.0;
                 let ref s = object.1;
 
                 gl::UseProgram(s.program);
+
+                gl::UniformMatrix4fv(s.uniforms.mvp_uniform, 1, gl::FALSE, mem::transmute(&mvp));
+                gl::UniformMatrix4fv(s.uniforms.model_uniform, 1, gl::FALSE, mem::transmute(&model));
+                gl::UniformMatrix4fv(s.uniforms.view_uniform, 1, gl::FALSE, mem::transmute(&view));
                 
                 gl::BindBuffer(gl::ARRAY_BUFFER, o.element_vbo);
                 
