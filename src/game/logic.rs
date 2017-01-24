@@ -32,18 +32,19 @@ impl system::System for Logic {
                 let teapot_raw = tobj::load_obj(&Path::new("resources/mesh/sphere_hipoly.obj"));
                 assert!(teapot_raw.is_ok());
                 let models  = teapot_raw.unwrap().0;
-                let teapot = object::tobj_to_object(&models.get(0).unwrap());
 
                 let shader;
                 unsafe { shader = shader::glsl_init("resources/glsl/standard.vert", "resources/glsl/standard.frag"); };
                 let rc_shader: Rc<shader::Shader> = Rc::new(shader);
+                
+                let teapot = object::tobj_to_object(&models.get(0).unwrap(), rc_shader);
                 
                 let mut scene = Scene { 
                     name: "Test Scene",
                     objects: LinkedList::new(),
                     camera: Camera::new(),
                 };
-                scene.objects.push_back( (teapot, rc_shader.clone()) );
+                scene.objects.push_back(teapot);
                 let rc_scene: Rc<Scene> = Rc::new(scene);
                 bus.post(Message::LoadScene(rc_scene));
             },

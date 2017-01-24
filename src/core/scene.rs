@@ -7,7 +7,7 @@ use game::camera::Camera;
 
 pub struct Scene {
     pub name: &'static str,
-    pub objects: LinkedList<(Object, Rc<Shader>)>,
+    pub objects: LinkedList<Object>,
     pub camera: Camera,
 }
 

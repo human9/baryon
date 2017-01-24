@@ -4,16 +4,18 @@ extern crate tobj;
 use std::collections::HashSet;
 use std::mem;
 use self::gl::types::*;
+use render::shader::Shader;
+use std::rc::Rc;
 
-#[derive(Debug)]
 pub struct Object {
     pub element_vbo: GLuint,
     pub index_vbo: GLuint,
     pub element_array: Vec<GLfloat>,
     pub index_array: Vec<GLuint>,
+    pub shader: Rc<Shader>,
 }
 
-pub fn tobj_to_object(model: &tobj::Model) -> Object {
+pub fn tobj_to_object(model: &tobj::Model, shader: Rc<Shader>) -> Object {
 
     let ref mesh = model.mesh;
     println!("vert: {}", mesh.positions.len());
@@ -93,7 +95,8 @@ pub fn tobj_to_object(model: &tobj::Model) -> Object {
         element_vbo: element_vbo,
         index_vbo: index_vbo,
         element_array: element_array,
-        index_array: index_array
+        index_array: index_array,
+        shader: shader.clone(),
     }
 
 }

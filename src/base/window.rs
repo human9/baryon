@@ -70,7 +70,7 @@ impl system::System for Windowing {
 
                 }
             }
-            let _ = self.window.swap_buffers();
+            self.window.swap_buffers().unwrap();
 
         }
         

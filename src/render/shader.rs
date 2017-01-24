@@ -30,6 +30,24 @@ pub struct Uniforms {
     pub sampler_uniform: GLint,
 }
 
+fn get_attribute(name: &str, program: GLuint) -> GLint {
+    let ret;
+    unsafe { ret = gl::GetAttribLocation(program, CString::new(name).unwrap().as_ptr()); }
+    if ret == -1 {
+        println!("Failed to bind attribute {}", name);
+    }
+    ret
+}
+
+fn get_uniform(name: &str, program: GLuint) -> GLint {
+    let ret;
+    unsafe { ret = gl::GetUniformLocation(program, CString::new(name).unwrap().as_ptr()); }
+    if ret == -1 {
+        println!("Failed to bind uniform {}", name);
+    }
+    ret
+}
+
 pub unsafe fn glsl_init(vert: &str, frag: &str) -> Shader {
 
     let program = link_program(
@@ -38,16 +56,16 @@ pub unsafe fn glsl_init(vert: &str, frag: &str) -> Shader {
     );
 
     let attributes = Attributes {
-        vertex_attribute: gl::GetAttribLocation(program, CString::new("coord3d").unwrap().as_ptr()),
-        uv_attribute: gl::GetAttribLocation(program, CString::new("uv").unwrap().as_ptr()),
-        normals_attribute: gl::GetAttribLocation(program, CString::new("normals").unwrap().as_ptr()),
+        vertex_attribute: get_attribute("coord3d", program),
+        uv_attribute: get_attribute("uv", program),
+        normals_attribute: get_attribute("normals", program),
     };
 
     let uniforms = Uniforms {
-        model_uniform: gl::GetUniformLocation(program, CString::new("model").unwrap().as_ptr()),
-        view_uniform: gl::GetUniformLocation(program, CString::new("view").unwrap().as_ptr()),
-        mvp_uniform: gl::GetUniformLocation(program, CString::new("mvp").unwrap().as_ptr()),
-        sampler_uniform: gl::GetUniformLocation(program, CString::new("sampler").unwrap().as_ptr()),
+        model_uniform: get_uniform("model", program),
+        view_uniform: get_uniform("view", program),
+        mvp_uniform: get_uniform("mvp", program),
+        sampler_uniform: get_uniform("sampler", program),
     };
 
     Shader {
