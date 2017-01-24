@@ -6,8 +6,10 @@ use std::mem;
 use self::gl::types::*;
 use render::shader::Shader;
 use std::rc::Rc;
+use std::ptr;
 
 pub struct Object {
+    pub vao: GLuint,
     pub element_vbo: GLuint,
     pub index_vbo: GLuint,
     pub element_array: Vec<GLfloat>,
@@ -70,7 +72,13 @@ pub fn tobj_to_object(model: &tobj::Model, shader: Rc<Shader>) -> Object {
 
     let mut element_vbo = 0;
     let mut index_vbo = 0;
+    let mut vao = 0;
+
     unsafe {
+
+        gl::GenVertexArrays(1, &mut vao);
+        gl::BindVertexArray(vao);
+
         gl::GenBuffers(1, &mut element_vbo);
         gl::BindBuffer(gl::ARRAY_BUFFER, element_vbo);
         gl::BufferData(
@@ -88,10 +96,50 @@ pub fn tobj_to_object(model: &tobj::Model, shader: Rc<Shader>) -> Object {
             mem::transmute(&index_array[0]),
             gl::STATIC_DRAW
         );
+
+        gl::UseProgram(shader.program);
+
+        gl::Enable(gl::BLEND);
+        gl::Enable(gl::DEPTH_TEST);
+        gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
+
+        gl::BindBuffer(gl::ARRAY_BUFFER, element_vbo);
+        
+        gl::EnableVertexAttribArray(shader.attributes.vertex_attribute as GLuint);
+        gl::EnableVertexAttribArray(shader.attributes.uv_attribute as GLuint);
+        gl::EnableVertexAttribArray(shader.attributes.normals_attribute as GLuint);
+
+        gl::VertexAttribPointer(
+            shader.attributes.vertex_attribute as GLuint,
+            3,
+            gl::FLOAT,
+            gl::FALSE,
+            (mem::size_of::<GLfloat>() * 8) as GLsizei,
+            ptr::null()
+        );
+        gl::VertexAttribPointer(
+            shader.attributes.uv_attribute as GLuint,
+            2,
+            gl::FLOAT,
+            gl::FALSE,
+            (mem::size_of::<GLfloat>() * 8) as GLsizei,
+            (mem::size_of::<GLfloat>() * 3) as *const GLvoid,
+        );
+        gl::VertexAttribPointer(
+            shader.attributes.normals_attribute as GLuint,
+            3,
+            gl::FLOAT,
+            gl::FALSE,
+            (mem::size_of::<GLfloat>() * 8) as GLsizei,
+            (mem::size_of::<GLfloat>() * 5) as *const GLvoid,
+        );
+
+        
     }
 
     
     Object { 
+        vao: vao,
         element_vbo: element_vbo,
         index_vbo: index_vbo,
         element_array: element_array,

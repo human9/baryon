@@ -20,6 +20,7 @@ pub struct Rendering {
     name: &'static str,
     status: system::Status,
     scene: Option<Rc<Scene>>,
+    resolution: (u32, u32),
 }
 
 impl Rendering {
@@ -30,22 +31,32 @@ impl Rendering {
     fn shutdown(&mut self) {
         self.status = system::Status::Finished;
     }
+
+    fn rotate_camera(&mut self, x: i32, y: i32) {
+        if let Some(ref mut scene) = self.scene {
+            let s = Rc::get_mut(scene).unwrap();
+            s.camera.add_azimuth(x as f32/40.0); 
+            s.camera.add_elevation(-y as f32/40.0);
+        }
+    }
+
+    fn move_camera(&mut self, movement: (i32, i32)) {
+        if let Some(ref mut scene) = self.scene {
+            let s = Rc::get_mut(scene).unwrap();
+            s.camera.add_strafe(movement.0 as f32);
+            s.camera.add_forward(movement.1 as f32);
+        }
+    }
 }
 
 impl system::System for Rendering {
     fn init() -> Self {
-        Rendering { name: "Rendering", status: system::Status::Okay, scene: None }
+        Rendering { name: "Rendering", status: system::Status::Okay, scene: None, resolution: (800, 600)}
     }
 
     fn run(&mut self, bus: &mut Bus) -> &system::Status {
 
         unsafe { 
-            
-        
-            gl::Enable(gl::BLEND);
-            gl::Enable(gl::DEPTH_TEST);
-            gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
-            
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
         };
 
@@ -60,51 +71,21 @@ impl system::System for Rendering {
             let up = vec3(0.0, 1.0, 0.0);
             let view = look_at(eye, center, up);
 
-            let projection = perspective::<f32>(45.0, 800./600., 0.1, 1000.0);
+            let projection = perspective::<f32>(45.0, self.resolution.0 as f32/self.resolution.1 as f32, 0.1, 1000.0);
 
             let mvp = projection * view * model;
 
-            for object in scene.objects.iter() {
-                let ref o = object.0;
-                let ref s = object.1;
+            for o in scene.objects.iter() {
+                let ref s = o.shader;
 
                 gl::UseProgram(s.program);
+
+                gl::PolygonMode( gl::FRONT_AND_BACK, gl::LINE );
 
                 gl::UniformMatrix4fv(s.uniforms.mvp_uniform, 1, gl::FALSE, mem::transmute(&mvp));
                 gl::UniformMatrix4fv(s.uniforms.model_uniform, 1, gl::FALSE, mem::transmute(&model));
                 gl::UniformMatrix4fv(s.uniforms.view_uniform, 1, gl::FALSE, mem::transmute(&view));
                 
-                gl::BindBuffer(gl::ARRAY_BUFFER, o.element_vbo);
-                
-                gl::EnableVertexAttribArray(s.attributes.vertex_attribute as GLuint);
-                gl::VertexAttribPointer(
-                    s.attributes.vertex_attribute as GLuint,
-                    3,
-                    gl::FLOAT,
-                    gl::FALSE,
-                    (mem::size_of::<GLfloat>() * 8) as GLsizei,
-                    ptr::null()
-                );
-
-                gl::EnableVertexAttribArray(s.attributes.uv_attribute as GLuint);
-                gl::VertexAttribPointer(
-                    s.attributes.uv_attribute as GLuint,
-                    2,
-                    gl::FLOAT,
-                    gl::FALSE,
-                    (mem::size_of::<GLfloat>() * 8) as GLsizei,
-                    (mem::size_of::<GLfloat>() * 3) as *const GLvoid,
-                );
-                
-                gl::EnableVertexAttribArray(s.attributes.normals_attribute as GLuint);
-                gl::VertexAttribPointer(
-                    s.attributes.normals_attribute as GLuint,
-                    3,
-                    gl::FLOAT,
-                    gl::FALSE,
-                    (mem::size_of::<GLfloat>() * 8) as GLsizei,
-                    (mem::size_of::<GLfloat>() * 5) as *const GLvoid,
-                );
 
                 gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, o.index_vbo);
                 gl::DrawElements(
@@ -123,6 +104,16 @@ impl system::System for Rendering {
         match msg {
             &Message::Shutdown => self.shutdown(),
             &Message::LoadScene(ref scene) => self.load_scene(scene),
+            &Message::Resized(w, h) => {
+                unsafe {gl::Viewport(0, 0, w as i32, h as i32)};
+                self.resolution = (w, h);
+            },
+            &Message::RotateCamera(x, y) => {
+                self.rotate_camera(x, y);
+            },
+            &Message::MoveCamera((x, y)) => {
+                self.move_camera((x,y));
+            },
             //_ => (),
         }
     }

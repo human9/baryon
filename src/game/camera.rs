@@ -25,7 +25,6 @@ impl Camera {
     pub fn add_azimuth(&mut self, a: f32) {
         self.azimuth += a;
         self.azimuth = fmod(self.azimuth, 360.0);
-        
     }
 
     pub fn add_elevation(&mut self, d: f32) {
@@ -36,15 +35,15 @@ impl Camera {
     pub fn add_forward(&mut self, z: f32) {
         let az = self.azimuth * PI / 180.;
         let el = self.elevation * PI / 180.;
-        self.position[0] += z * el.cos() * -az.sin();
-        self.position[1] += z * -el.sin();
+        self.position[0] += z * el.cos() * -(az.sin());
+        self.position[1] += z * -(el.sin());
         self.position[2] += z * el.cos() * az.cos();
     }
     
     pub fn add_strafe(&mut self, x: f32) {
-        let az = self.azimuth * PI / 180.;
+        let az = (self.azimuth+90.0) * PI / 180.;
         self.position[0] += x * az.sin();
-        self.position[2] += x * -az.cos();
+        self.position[2] += x * -(az.cos());
     }
 
     // Return where the camera is
