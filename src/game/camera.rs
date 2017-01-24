@@ -17,7 +17,7 @@ impl Camera {
         Camera {
             elevation: 0.,
             azimuth: 0.,
-            radius: 0.,
+            radius: 10.,
             position: Vector3::<f32>::new(0.,0.,0.),
         }
     }
