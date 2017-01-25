@@ -89,9 +89,8 @@ pub fn tobj_to_object(model: &tobj::Model, shader: Rc<Shader>) -> Object {
 
         gl::UseProgram(shader.program);
 
-        gl::Enable(gl::BLEND);
-        gl::Enable(gl::DEPTH_TEST);
-        gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
+        //gl::Enable(gl::BLEND);
+        //gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
 
         gl::BindBuffer(gl::ARRAY_BUFFER, element_vbo);
         
@@ -123,7 +122,8 @@ pub fn tobj_to_object(model: &tobj::Model, shader: Rc<Shader>) -> Object {
             (mem::size_of::<GLfloat>() * 8) as GLsizei,
             (mem::size_of::<GLfloat>() * 5) as *const GLvoid,
         );
-
+                
+        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, index_vbo);
         
     }
 

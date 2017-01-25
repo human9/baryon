@@ -40,8 +40,6 @@ impl system::System for Windowing {
             window.set_cursor_position(W/2, H/2);
 
             gl::load_with(|symbol| window.get_proc_address(symbol) as *const _);
-
-            gl::ClearColor(0.2, 0.0, 0.2, 0.0);
         
         };
 

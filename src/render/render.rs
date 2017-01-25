@@ -51,13 +51,20 @@ impl Rendering {
 
 impl system::System for Rendering {
     fn init() -> Self {
+
+        unsafe{
+            gl::ClearColor(0.2, 0.0, 0.2, 0.0);
+            gl::PolygonMode( gl::FRONT_AND_BACK, gl::LINE );
+        }
+
         Rendering { name: "Rendering", status: system::Status::Okay, scene: None, resolution: (800, 600)}
+
     }
 
     fn run(&mut self, bus: &mut Bus) -> &system::Status {
 
         unsafe { 
-            gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
+            gl::Clear(gl::COLOR_BUFFER_BIT);
         };
 
         if let Some(ref scene) = self.scene { unsafe {
@@ -79,16 +86,12 @@ impl system::System for Rendering {
             for o in scene.objects.iter() {
                 let ref s = o.shader;
 
-                gl::UseProgram(s.program);
-
-                gl::PolygonMode( gl::FRONT_AND_BACK, gl::LINE );
+                //gl::UseProgram(s.program);
 
                 gl::UniformMatrix4fv(s.uniforms.mvp_uniform, 1, gl::FALSE, mem::transmute(&mvp));
-                gl::UniformMatrix4fv(s.uniforms.model_uniform, 1, gl::FALSE, mem::transmute(&model));
-                gl::UniformMatrix4fv(s.uniforms.view_uniform, 1, gl::FALSE, mem::transmute(&view));
-                
+                //gl::UniformMatrix4fv(s.uniforms.model_uniform, 1, gl::FALSE, mem::transmute(&model));
+                //gl::UniformMatrix4fv(s.uniforms.view_uniform, 1, gl::FALSE, mem::transmute(&view));
 
-                gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, o.index_vbo);
                 gl::DrawElements(
                     gl::TRIANGLES,
                     o.index_array.len() as GLint,
