@@ -14,6 +14,7 @@ pub struct Windowing {
     status: system::Status,
     window: glutin::Window,
     m_pos: (i32, i32),
+    direction: (i32, i32, i32, i32),
 }
 
 fn shutdown(status: &mut system::Status, bus: &mut Bus) {
@@ -44,7 +45,13 @@ impl system::System for Windowing {
         
         };
 
-        Windowing { name: "Windowing", status: system::Status::Okay, window: window, m_pos: (W/2,H/2) }
+        Windowing { 
+            name: "Windowing",
+            status: system::Status::Okay,
+            window: window, 
+            m_pos: (W/2,H/2),
+            direction: (0, 0, 0, 0),
+        }
     }
 
     fn run(&mut self, bus: &mut Bus) -> &system::Status {
@@ -54,18 +61,27 @@ impl system::System for Windowing {
 
             for event in self.window.poll_events() {
 
-                let mut direction = (0, 0);
-
                 match event {
                     Event::Closed => shutdown(&mut self.status, bus),
                     Event::KeyboardInput(ElementState::Pressed, _, key) => 
                     {
                         match key.unwrap() {
                             VirtualKeyCode::Escape => shutdown(&mut self.status, bus),
-                            VirtualKeyCode::W => direction.1 += 1,
-                            VirtualKeyCode::A => direction.0 -= 1,
-                            VirtualKeyCode::S => direction.1 -= 1,
-                            VirtualKeyCode::D => direction.0 += 1,
+                            VirtualKeyCode::W => self.direction.0 = 1,
+                            VirtualKeyCode::A => self.direction.1 = 1,
+                            VirtualKeyCode::S => self.direction.2 = 1,
+                            VirtualKeyCode::D => self.direction.3 = 1,
+                            _ => (),
+                        }
+                    },
+
+                    Event::KeyboardInput(ElementState::Released, _, key) => 
+                    {
+                        match key.unwrap() {
+                            VirtualKeyCode::W => self.direction.0 = 0,
+                            VirtualKeyCode::A => self.direction.1 = 0,
+                            VirtualKeyCode::S => self.direction.2 = 0,
+                            VirtualKeyCode::D => self.direction.3 = 0,
                             _ => (),
                         }
                     },
@@ -76,7 +92,7 @@ impl system::System for Windowing {
 
                     Event::MouseMoved(x, y) => {
                         if (x, y) != self.m_pos {
-                            bus.post(Message::RotateCamera(self.m_pos.0 - x, self.m_pos.1 - y));
+                            bus.post(Message::RotateCamera(x - self.m_pos.0, y - self.m_pos.1));
 
                             let size = self.window.get_outer_size().unwrap();
                             self.m_pos = (size.0 as i32 / 2, size.1 as i32 / 2);
@@ -98,11 +114,15 @@ impl system::System for Windowing {
 
                 }
 
-                if direction != (0, 0) {
-                    bus.post(Message::MoveCamera(direction));
-                }
             }
             self.window.swap_buffers().unwrap();
+                
+            if self.direction != (0, 0, 0, 0) {
+                let dir = (self.direction.3 - self.direction.1, self.direction.2 - self.direction.0);
+                if dir != (0, 0) {
+                    bus.post(Message::MoveCamera(dir));
+                }
+            }
 
         }
         
