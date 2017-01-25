@@ -29,7 +29,7 @@ impl system::System for Logic {
             0 => {
                 self.state += 1;
 
-                let teapot_raw = tobj::load_obj(&Path::new("res/mesh/earth.obj"));
+                let teapot_raw = tobj::load_obj(&Path::new("res/mesh/sphere_hipoly.obj"));
                 assert!(teapot_raw.is_ok());
                 let models  = teapot_raw.unwrap().0;
 

@@ -68,6 +68,7 @@ impl system::System for Rendering {
             
             let eye = scene.camera.get_eye();
             let center = scene.camera.get_center();
+            //println!("{:.?}", model);
             let up = vec3(0.0, 1.0, 0.0);
             let view = look_at(eye, center, up);
 

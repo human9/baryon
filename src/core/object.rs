@@ -1,7 +1,6 @@
 extern crate gl;
 extern crate tobj;
 
-use std::collections::HashSet;
 use std::collections::HashMap;
 use std::mem;
 use self::gl::types::*;
@@ -25,45 +24,14 @@ pub fn tobj_to_object(model: &tobj::Model, shader: Rc<Shader>) -> Object {
     println!("norm: {}", mesh.normals.len());
     println!("text: {}", mesh.texcoords.len());
     println!("indc: {}", mesh.indices.len());
+    //println!("{:.?}", mesh.indices);
 
-
-    let has_normals = mesh.normals.len() > 0;
-    let has_texcoords = mesh.texcoords.len() > 0;
-
-    /*
-     * OpenGL only supports a single index. So we make the indices
-     * into tuples and then use a hashset to identify duplicates.
-     */
-    
-    let mut div = 1; // we have all things
-    if has_normals { div += 1 };
-    if has_texcoords { div += 1 };
-
-    let mut raw_indices = Vec::new();
-    for i in 0..mesh.indices.len()/div {
-        let index = i * div;
-        let p = *mesh.indices.get(index).unwrap();
-        let mut t = 0;
-        let mut n = 0;
-        if has_normals && has_texcoords {
-            t = *mesh.indices.get(index + 1).unwrap();
-            n = *mesh.indices.get(index + 2).unwrap();
-        } else {
-            if has_normals {
-                n = *mesh.indices.get(index + 1).unwrap();
-            }
-            if has_texcoords {
-                t = *mesh.indices.get(index + 1).unwrap();
-            }
-        }
-        raw_indices.push( (p, t, n) );
-    }
     let mut map = HashMap::new();
     let mut i: u32 = 0;
     let mut elements = Vec::new(); // temp for retaining index
     let mut element_array = Vec::new(); // actual element array
     let mut index_array = Vec::new(); // actual index array
-    for index in raw_indices.iter() {
+    for index in mesh.indices.iter() {
         if !map.contains_key(index) {
             map.insert(index, i);
             
@@ -71,16 +39,16 @@ pub fn tobj_to_object(model: &tobj::Model, shader: Rc<Shader>) -> Object {
             index_array.push(i as u32); // push the index of this element
             i = i+1;
 
-            let v = (index.0 * 3) as usize;
+            let v = (index * 3) as usize;
             element_array.push(*mesh.positions.get(v).unwrap());
             element_array.push(*mesh.positions.get(v + 1).unwrap());
             element_array.push(*mesh.positions.get(v + 2).unwrap());
 
-            let t = (index.1 * 2) as usize;
+            let t = (index * 2) as usize;
             element_array.push(*mesh.texcoords.get(t).unwrap_or(&0.));
             element_array.push(*mesh.texcoords.get(t + 1).unwrap_or(&0.));
 
-            let n = (index.2 * 3) as usize;
+            let n = (index * 3) as usize;
             element_array.push(*mesh.normals.get(n).unwrap_or(&0.));
             element_array.push(*mesh.normals.get(n + 1).unwrap_or(&0.));
             element_array.push(*mesh.normals.get(n + 2).unwrap_or(&0.));
@@ -89,6 +57,7 @@ pub fn tobj_to_object(model: &tobj::Model, shader: Rc<Shader>) -> Object {
             index_array.push(*map.get(index).unwrap() as u32); // push index of non-unique element
         }
     }
+    println!("My length: {}", index_array.len());
     //println!("{:.?}", element_array);
 
     let mut element_vbo = 0;

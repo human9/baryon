@@ -1,5 +1,4 @@
 extern crate glm;
-use self::glm::builtin::fmod;
 use self::glm::builtin::clamp;
 use self::glm::Vector3;
 use std::f32::consts::PI;
@@ -24,7 +23,7 @@ impl Camera {
 
     pub fn add_azimuth(&mut self, a: f32) {
         self.azimuth += a;
-        self.azimuth = fmod(self.azimuth, 360.0);
+        self.azimuth = self.azimuth % 360.0;
     }
 
     pub fn add_elevation(&mut self, d: f32) {
@@ -58,7 +57,7 @@ impl Camera {
         Vector3::<f32>::new(
             self.position[0] + self.radius * el.cos() * az.sin(),
             self.position[1] + self.radius * el.sin(),
-            self.position[2] + -self.radius * el.cos() * az.cos(),
+            self.position[2] - self.radius * el.cos() * az.cos(),
         )
     }
 
