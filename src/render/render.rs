@@ -49,6 +49,29 @@ impl Rendering {
     }
 }
 
+#[inline]
+fn b_look_at<T>(
+    eye: Vector3<T>,
+    center: Vector3<T>,
+    up: Vector3<T>
+) -> Matrix4<T>
+where
+    T : BaseFloat + GenFloat<T>
+{
+    let zero = num::zero::<T>();
+    let one = num::one::<T>();
+    let f = normalize(center - eye);
+    //let up_n = normalize(up);
+    let s = normalize(cross(f, up));
+    let u = cross(s, f);
+    Matrix4::new(
+        Vector4::new(s.x, u.x,-f.x, zero),
+        Vector4::new(s.y, u.y,-f.y, zero),
+        Vector4::new(s.z, u.z,-f.z, zero),
+        Vector4::new(-dot(s, eye), -dot(u, eye), dot(f, eye), one)
+    )
+}
+
 impl system::System for Rendering {
     fn init() -> Self {
 
@@ -75,9 +98,9 @@ impl system::System for Rendering {
             
             let eye = scene.camera.get_eye();
             let center = scene.camera.get_center();
-            //println!("{:.?}", model);
+            //println!("{:.?}", center);
             let up = vec3(0.0, 1.0, 0.0);
-            let view = look_at(eye, center, up);
+            let view = b_look_at(eye, center, up);
 
             let projection = perspective::<f32>(45.0, self.resolution.0 as f32/self.resolution.1 as f32, 0.1, 1000.0);
 
